@@ -248,19 +248,19 @@ while still keeping the digital proof format easy for developers to understand.
           </dd>
           <dt>Extensibility</dt>
           <dd>
-Creating and deploying new proof types is a fairly trivial undertaking
-to ensure that the proof format increases the rate of innovation in the
-digital proof space.
+Creating and deploying new cryptography suites can be performed in a
+decentralized manner ensuring a faster rate of innovation than centralized
+approaches.
           </dd>
           <dt>Syntax Agnostic Proofs</dt>
           <dd>
 Cryptographic proofs can be serialized in many different but equivalent ways and
 have often been tightly bound to the original document syntax. This
-specification enables one to create cryptographic proofs that are not
-bound to the original document syntax, which enable more advanced use cases
-such as being able to use a single digital signature across a variety of
-RDF-based graph serialization syntaxes such as JSON-LD, N-Quads, and TURTLE,
-without the need to regenerate the proof.
+specification enables one to create cryptographic proofs that are not bound to
+the original document syntax, which enable more advanced use cases such as being
+able to use a single digital signature across a variety of RDF-based graph
+serialization syntaxes such as JSON-LD, N-Quads, and TURTLE, without the need to
+regenerate the digital signature.
           </dd>
         </dl>
       </section>
@@ -353,7 +353,8 @@ is the [[SECURITY-VOCABULARY]].
         </p>
 
         <p>
-A proof can be added to a JSON document like the following:
+When adding a data integrity proof, the creator of the proof starts with a
+structured data document like the one below:
         </p>
 
         <pre class="example highlight" title="A simple JSON data document">
@@ -363,7 +364,8 @@ A proof can be added to a JSON document like the following:
         </pre>
 
         <p>
-by adding the parameters outlined in this section:
+The authenticity and data integrity of the document is secured by adding a
+data integrity proof:
         </p>
 
         <pre class="example highlight"
@@ -387,7 +389,7 @@ by adding the parameters outlined in this section:
 The proof example above uses the <code>JcsSignature2020</code>
 <a>proof type</a> to produce a verifiable digital proof by canonicalizing the
 input data using the JSON Canonicalization Scheme [[RFC8785]] and then
-digitally signing it using an Ed25519 elliptic curve signature.
+digitally signing it using the Edwards Digital Signature Algorithm.
         </p>
 
         <p>
@@ -430,7 +432,7 @@ by adding the parameters outlined in this section:
 The proof example above uses the <code>Ed25519Signature2020</code> <a>proof
 type</a> to produce a verifiable digital proof by canonicalizing the input data
 using the RDF Dataset Canonicalization algorithm [[RDF-DATASET-C14N]] and then
-digitally signing it using an Ed25519 elliptic curve signature.
+digitally signing it using the Edwards Digital Signature Algorithm.
         </p>
 
 <div class="issue">Create a separate section detailing an optional mechanism
