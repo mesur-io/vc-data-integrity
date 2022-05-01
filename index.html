@@ -286,16 +286,21 @@ This section specifies the data model that is used for expressing
       <section>
         <h3>Proofs</h3>
         <p>
-A <a>data integrity proof</a> is comprised of information about the proof,
-parameters required to verify it, and the proof value itself. All of this
-information is provided using vocabularies such as the
-[[SECURITY-VOCABULARY]].
+A <a>data integrity proof</a> is composed of a set of properties that represent the
+output of a proof generation algorithm and the parameters required to verify it.
         </p>
 
         <p>
-A <a>data integrity proof</a> MUST be specified via the `proof` or `proofChain`
-properties at the top level of the data object being protected. The following
-properties can be associated with the value:
+This specification supports the concept of associating one or more proofs in a
+single data document. For documents that contain more than one proof, there are
+two types of approaches that are specified: Proof Sets (un-ordered) and Proof
+Chains (ordered). See <a href="#proof-sets"></a> and <a
+href="#proof-chains"></a> for more information on each mechanism.
+        </p>
+        <p>
+Each <a>data integrity proof</a> MUST be specified via the `proof` or
+`proofChain` properties at the top level of the data object being protected. The
+following properties can be associated with each data integrity proof value:
         </p>
 
         <dl style="margin-left: 1em;">
@@ -490,56 +495,135 @@ be necessary to generate proof parameters such as a private key/seed
 that can be used along with an algorithm to deterministically generate
 nonces that are concatenated with each N-Quad to prevent rainbow
 table or similar attacks.</div>
-      </section>
 
-      <section>
-        <h3>Proof Purposes</h3>
+        <section>
+          <h3>Proof Purposes</h3>
 
-        <p>
-A proof that describes its purpose helps prevent it from being misused for some
-other purpose. For example, a proof created for the purposes of authentication
-might be mistaken for a proof created for the purposes of delegation if the
-purpose is not clearly expressed in the proof itself.
-        </p>
+          <p>
+  A proof that describes its purpose helps prevent it from being misused for some
+  other purpose. For example, a proof created for the purposes of authentication
+  might be mistaken for a proof created for the purposes of delegation if the
+  purpose is not clearly expressed in the proof itself.
+          </p>
 
-        <div class="issue">Add a mention of JWK's <code>key_ops</code>
-parameter and WebCrypto's <code>KeyUsage</code> restrictions; explain that
-Proof Purpose serves a similar goal but allows for finer-grained restrictions.
-        </div>
+          <div class="issue">Add a mention of JWK's <code>key_ops</code>
+  parameter and WebCrypto's <code>KeyUsage</code> restrictions; explain that
+  Proof Purpose serves a similar goal but allows for finer-grained restrictions.
+          </div>
 
-        <p>
-The following is a list of commonly used <a>proof purpose</a> values.
-        </p>
+          <p>
+  The following is a list of commonly used <a>proof purpose</a> values.
+          </p>
 
-        <dl>
-          <dt>authentication</dt>
-          <dd>
-Indicates that a given proof is only to be used for the purposes of an
-authentication protocol.
-          </dd>
-          <dt>assertionMethod</dt>
-          <dd>
-Indicates that a proof can only be used for making assertion about a subject.
-For example, an issuer would use this purpose when issuing a
-Verifiable Credential [[?VC-DATA-MODEL]].
-          </dd>
-          <dt>keyAgreement</dt>
-          <dd>
-Indicates that a proof is only to be used for key agreement protocols, such as
-Elliptic Curve Diffie Hellman key agreement used by popular encryption
-libraries.
-          </dd>
-          <dt>capabilityDelegation</dt>
-          <dd>
-Indicates that the proof can only be used for delegating capabilities. See the
-Authorization Capabilities [[ZCAP]] specification for more information.
-          </dd>
-          <dt>capabilityInvocation</dt>
-          <dd>
-Indicates that the proof can only be used for invoking capabilities. See the
-Authorization Capabilities [[ZCAP]] specification for more information.
-          </dd>
-        </dl>
+          <dl>
+            <dt>authentication</dt>
+            <dd>
+  Indicates that a given proof is only to be used for the purposes of an
+  authentication protocol.
+            </dd>
+            <dt>assertionMethod</dt>
+            <dd>
+  Indicates that a proof can only be used for making assertion about a subject.
+  For example, an issuer would use this purpose when issuing a
+  Verifiable Credential [[?VC-DATA-MODEL]].
+            </dd>
+            <dt>keyAgreement</dt>
+            <dd>
+  Indicates that a proof is only to be used for key agreement protocols, such as
+  Elliptic Curve Diffie Hellman key agreement used by popular encryption
+  libraries.
+            </dd>
+            <dt>capabilityDelegation</dt>
+            <dd>
+  Indicates that the proof can only be used for delegating capabilities. See the
+  Authorization Capabilities [[ZCAP]] specification for more information.
+            </dd>
+            <dt>capabilityInvocation</dt>
+            <dd>
+  Indicates that the proof can only be used for invoking capabilities. See the
+  Authorization Capabilities [[ZCAP]] specification for more information.
+            </dd>
+          </dl>
+        </section>
+
+        <section>
+          <h3>Proof Sets</h3>
+          <p>
+  A proof set is useful when the same data needs to be secured by multiple
+  entities, but where the order of proofs does not matter,
+  such as in the case of a set of signatures on a contract. A proof set,
+  which has no order, is represented by associating a set of proofs
+  with the <code>proof</code> key in a document.
+          </p>
+          <pre class="example highlight" title="A proof set in a data document">
+  {
+    "@context": [
+      {"title": "https://schema.org#title"},
+      "https://w3id.org/security/suites/ed25519-2020/v1"
+  ],
+    "title": "Hello world!",
+    "proof": [{
+      "type": "Ed25519Signature2020",
+      "created": "2020-11-05T19:23:24Z",
+      "verificationMethod": "https://ldi.example/issuer/1#z6MkjLrk3gKS2nnkeWcmcxi
+        ZPGskmesDpuwRBorgHxUXfxnG",
+      "proofPurpose": "assertionMethod",
+      "proofValue": "z4oey5q2M3XKaxup3tmzN4DRFTLVqpLMweBrSxMY2xHX5XTYVQeVbY8nQA
+        VHMrXFkXJpmEcqdoDwLWxaqA3Q1geV6"
+    }, {
+      "type": "Ed25519Signature2020",
+      "created": "2020-11-05T13:08:49Z",
+      "verificationMethod": "https://pfps.example/issuer/2#z6MkGskxnGjLrk3gKS2mes
+        DpuwRBokeWcmrgHxUXfnncxiZP",
+      "proofPurpose": "assertionMethod",
+      "proofValue": "z5QLBrp19KiWXerb8ByPnAZ9wujVFN8PDsxxXeMoyvDqhZ6Qnzr5CG9876
+        zNht8BpStWi8H2Mi7XCY3inbLrZrm95"
+    }]
+  }
+          </pre>
+
+        </section>
+
+        <section>
+          <h3>Proof Chains</h3>
+          <p>
+  A proof chain is useful when the same data needs to be signed by
+  multiple entities and the order of when the proofs occurred matters,
+  such as in the case of a notary counter-signing a proof that had been
+  created on a document. A proof chain, where order needs to be preserved, is
+  represented by associating an ordered list of proofs with the
+  <code>proofChain</code> key in a document.
+          </p>
+          <pre class="example highlight" title="A proof chain in a data document">
+  {
+    "@context": [
+      {"title": "https://schema.org#title"},
+      "https://w3id.org/security/suites/ed25519-2020/v1"
+  ],
+    "title": "Hello world!",
+    "proofChain": [{
+      "type": "Ed25519Signature2020",
+      "created": "2020-11-05T19:23:42Z",
+      "verificationMethod": "https://ldi.example/issuer/1#z6MkjLrk3gKS2nnkeWcmcxi
+        ZPGskmesDpuwRBorgHxUXfxnG",
+      "proofPurpose": "assertionMethod",
+      "proofValue": "zVbY8nQAVHMrXFkXJpmEcqdoDwLWxaqA3Q1geV64oey5q2M3XKaxup3tmzN4
+        DRFTLVqpLMweBrSxMY2xHX5XTYVQe"
+    }, {
+      "type": "Ed25519Signature2020",
+      "created": "2020-11-05T21:28:14Z",
+      "verificationMethod": "https://pfps.example/issuer/2#z6MkGskxnGjLrk3gKS2mes
+        DpuwRBokeWcmrgHxUXfnncxiZP",
+      "proofPurpose": "assertionMethod",
+      "proofValue": "z6Qnzr5CG9876zNht8BpStWi8H2Mi7XCY3inbLrZrm955QLBrp19KiWXerb8
+        ByPnAZ9wujVFN8PDsxxXeMoyvDqhZ"
+    }]
+  }
+          </pre>
+
+        </section>
+
+
       </section>
 
       <section>
@@ -1219,94 +1303,6 @@ example described in <a href="#capability-invocation"></a>.
             </pre>
           </section>
         </section>
-      </section>
-
-    </section>
-
-    <section>
-      <h2>Multiple Proofs</h2>
-      <p>
-The Data Integrity specification supports the concept of multiple
-proofs in a single document. There are two types of multi-proof
-approaches that are identified: Proof Sets (un-ordered) and Proof Chains
-(ordered).
-      </p>
-
-      <section>
-        <h3>Proof Sets</h3>
-        <p>
-A proof set is useful when the same data needs to be secured by multiple
-entities, but where the order of proofs does not matter,
-such as in the case of a set of signatures on a contract. A proof set,
-which has no order, is represented by associating a set of proofs
-with the <code>proof</code> key in a document.
-        </p>
-        <pre class="example highlight" title="A proof set in a data document">
-{
-  "@context": [
-    {"title": "https://schema.org#title"},
-    "https://w3id.org/security/suites/ed25519-2020/v1"
-],
-  "title": "Hello world!",
-  "proof": [{
-    "type": "Ed25519Signature2020",
-    "created": "2020-11-05T19:23:24Z",
-    "verificationMethod": "https://ldi.example/issuer/1#z6MkjLrk3gKS2nnkeWcmcxi
-      ZPGskmesDpuwRBorgHxUXfxnG",
-    "proofPurpose": "assertionMethod",
-    "proofValue": "z4oey5q2M3XKaxup3tmzN4DRFTLVqpLMweBrSxMY2xHX5XTYVQeVbY8nQA
-      VHMrXFkXJpmEcqdoDwLWxaqA3Q1geV6"
-  }, {
-    "type": "Ed25519Signature2020",
-    "created": "2020-11-05T13:08:49Z",
-    "verificationMethod": "https://pfps.example/issuer/2#z6MkGskxnGjLrk3gKS2mes
-      DpuwRBokeWcmrgHxUXfnncxiZP",
-    "proofPurpose": "assertionMethod",
-    "proofValue": "z5QLBrp19KiWXerb8ByPnAZ9wujVFN8PDsxxXeMoyvDqhZ6Qnzr5CG9876
-      zNht8BpStWi8H2Mi7XCY3inbLrZrm95"
-  }]
-}
-        </pre>
-
-      </section>
-
-      <section>
-        <h3>Proof Chains</h3>
-        <p>
-A proof chain is useful when the same data needs to be signed by
-multiple entities and the order of when the proofs occurred matters,
-such as in the case of a notary counter-signing a proof that had been
-created on a document. A proof chain, where order needs to be preserved, is
-represented by associating an ordered list of proofs with the
-<code>proofChain</code> key in a document.
-        </p>
-        <pre class="example highlight" title="A proof chain in a data document">
-{
-  "@context": [
-    {"title": "https://schema.org#title"},
-    "https://w3id.org/security/suites/ed25519-2020/v1"
-],
-  "title": "Hello world!",
-  "proofChain": [{
-    "type": "Ed25519Signature2020",
-    "created": "2020-11-05T19:23:42Z",
-    "verificationMethod": "https://ldi.example/issuer/1#z6MkjLrk3gKS2nnkeWcmcxi
-      ZPGskmesDpuwRBorgHxUXfxnG",
-    "proofPurpose": "assertionMethod",
-    "proofValue": "zVbY8nQAVHMrXFkXJpmEcqdoDwLWxaqA3Q1geV64oey5q2M3XKaxup3tmzN4
-      DRFTLVqpLMweBrSxMY2xHX5XTYVQe"
-  }, {
-    "type": "Ed25519Signature2020",
-    "created": "2020-11-05T21:28:14Z",
-    "verificationMethod": "https://pfps.example/issuer/2#z6MkGskxnGjLrk3gKS2mes
-      DpuwRBokeWcmrgHxUXfnncxiZP",
-    "proofPurpose": "assertionMethod",
-    "proofValue": "z6Qnzr5CG9876zNht8BpStWi8H2Mi7XCY3inbLrZrm955QLBrp19KiWXerb8
-      ByPnAZ9wujVFN8PDsxxXeMoyvDqhZ"
-  }]
-}
-        </pre>
-
       </section>
 
     </section>
