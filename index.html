@@ -490,9 +490,6 @@ be necessary to generate proof parameters such as a private key/seed
 that can be used along with an algorithm to deterministically generate
 nonces that are concatenated with each N-Quad to prevent rainbow
 table or similar attacks.</div>
-
-
-
       </section>
 
       <section>
@@ -500,7 +497,9 @@ table or similar attacks.</div>
 
         <p>
 A proof that describes its purpose helps prevent it from being misused for some
-other purpose.
+other purpose. For example, a proof created for the purposes of authentication
+might be mistaken for a proof created for the purposes of delegation if the
+purpose is not clearly expressed in the proof itself.
         </p>
 
         <div class="issue">Add a mention of JWK's <code>key_ops</code>
@@ -520,32 +519,27 @@ authentication protocol.
           </dd>
           <dt>assertionMethod</dt>
           <dd>
-Indicates that a proof can only be used for making assertions, for example
-signing a Verifiable Credential.
+Indicates that a proof can only be used for making assertion about a subject.
+For example, an issuer would use this purpose when issuing a
+Verifiable Credential [[?VC-DATA-MODEL]].
           </dd>
           <dt>keyAgreement</dt>
           <dd>
-Indicates that a proof is used for for key agreement protocols, such as
+Indicates that a proof is only to be used for key agreement protocols, such as
 Elliptic Curve Diffie Hellman key agreement used by popular encryption
 libraries.
           </dd>
           <dt>capabilityDelegation</dt>
           <dd>
 Indicates that the proof can only be used for delegating capabilities. See the
-Authorization Capabilities [[ZCAP]] specification for more detail.
+Authorization Capabilities [[ZCAP]] specification for more information.
           </dd>
           <dt>capabilityInvocation</dt>
           <dd>
 Indicates that the proof can only be used for invoking capabilities. See the
-Authorization Capabilities [[ZCAP]] specification for more detail.
+Authorization Capabilities [[ZCAP]] specification for more information.
           </dd>
         </dl>
-
-        <p>
-Note: The Authorization Capabilities [[ZCAP]] specification defines additional
-proof purposes for that use case, such as <code>capabilityInvocation</code> and
-<code>capabilityDelegation</code>.
-        </p>
       </section>
 
       <section>
