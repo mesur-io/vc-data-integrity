@@ -631,16 +631,24 @@ table or similar attacks.</div>
 
         <p>
 A <a>controller document</a> is a set of data that specifies one or more
-relationships between a <a>controller</a> and a set of data, such as a set of
-public cryptographic keys. The <a>controller document</a> SHOULD
-contain <a>verification relationships</a> that explicitly permit the use of
-certain <a>verification methods</a> for specific purposes.
+<a>verification relationships</a> between a <a>controller</a> and a set of
+<a>verification methods</a> such as public cryptographic keys. An example
+of such a document is shown below:
         </p>
 
-        <div class="issue">Add examples of common Controller documents, such as
-controller documents published on a ledger-based registry, or on a mutable medium in
-combination with an integrity protection mechanism such as Hashlinks.
-        </div>
+        <pre class="example nohighlight"
+          title="A simple controller document">
+{
+  "@conext": "https://w3id.org/security/v3",
+  "id": "https://integrity.example/controllers/jane",
+  "authentication": {
+    "id": "https://integrity.example/controllers/jane#key-1"
+    "type": "Multikey",
+    "controller": "https://integrity.example/controllers/jane",
+    "publicKeyMultibase": "z6MkmM42vxfqZQsv4ehtTjFFxQ4sQKS2w6WR7emozFAn5cxu"
+  }
+}
+        </pre>
 
         <section>
           <h2>Verification Methods</h2>
